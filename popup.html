@@ -1,0 +1,63 @@
+<html>
+
+<head>
+	<link rel="stylesheet" type="text/css" href="styles/popup.css">
+	<link rel="stylesheet" type="text/css" href="styles/colorPicker.css">
+</head>
+
+<body>
+	<div class="container">
+		<h2>Tab Counter</h2>
+		<div id="output">
+
+			<h2>
+				Open tabs:
+				<strong class="totalOpen"></strong>
+			</h2>
+
+			<table>
+				<tr>
+					<td class="propName">
+						<h2>Background: </h2>
+					</td>
+					<td>
+						<input type="text" name="custom_color" placeholder="#FFFFFF" id="pickcolorbg" class="call-picker">
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<div id="color-palette">
+							<div class="container">
+								<div class="palette" id="background"></div>
+							</div>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="propName">
+						<h2>TextColor:</h2>
+					</td>
+					<td>
+						<input type="text" name="custom_color" placeholder="#FFFFFF" id="pickcolortxt" class="call-picker">
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<div id="color-palette">
+							<div class="container">
+								<div class="palette" id="textColor"></div>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+
+			<div id="status"></div>
+			<button id="save">Save</button>
+			<script type="text/javascript" src="scripts/jquery-3.2.1.min.js"></script>
+			<script type="text/javascript" src="scripts/popup.js"></script>
+		</div>
+	</div>
+</body>
+
+</html>

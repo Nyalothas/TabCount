@@ -1,0 +1,63 @@
+body {
+    background: #1c252e;
+    font: 16px/1.5em "Open Sans", sans-serif;
+    margin: 0;
+}
+
+h2 {
+    margin: 0;
+    font: inherit;
+    color: #9aa1a7;
+    font-size: 16px;
+}
+
+.container{
+    width: 464px;
+    margin: 3px;
+}
+
+.propName {
+    width: 100px;
+}
+
+#color-palette {
+    width: 640px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #777;
+    float: left;
+}
+
+#color-palette .container {
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    overflow: hidden;
+    float: left;
+    transition: all 0.5s;
+}
+
+#color-palette .container > * {
+    float: left;
+}
+
+#color-palette .palette {
+    width: 456px;
+    height: 38px;
+    margin: 3px;
+}
+
+#color-palette .palette .sample {
+    width: 30px;
+    height: 30px;
+    position: relative;
+    border: 1px solid transparent;
+    float: left;
+    transition: all 0.2s;
+}
+
+#color-palette .palette .sample:hover {
+    cursor: pointer;
+    border-color: #BBB;
+    transform: scale(1.15);
+    border-radius: 3px;
+}
