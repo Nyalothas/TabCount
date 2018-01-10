@@ -72,6 +72,13 @@ function restore_options() {
 document.addEventListener('DOMContentLoaded', restore_options);
 document.getElementById('save').addEventListener('click', save_options);
 
+document.getElementById('reset').addEventListener('click', reset);
+function reset(){
+  chrome.browserAction.getBadgeText({}, function (result) {
+    draw(undefined,undefined,result);
+  });
+}
+
 function draw(bg = "#262626", txt = "#FFFFFF", text) {
 
   var canvas = document.createElement('canvas');
