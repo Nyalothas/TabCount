@@ -1,0 +1,14 @@
+To do:
+- message: alert me when tabcounter reached x number
+- $("#pickcolorbg").attr('placeholder','7'); //read the storage value?
+- lock value option
+- opacity slider
+- nicer input style
+
+  //context.clearRect(0,0,19,19);
+- save options
+
+change color on input
+$("#pickcolorbg").on("change paste keyup", function() {
+  alert($(this).val()); 
+});

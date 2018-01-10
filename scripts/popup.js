@@ -24,21 +24,24 @@ pickerBg.children('div').hover(function () {
   var codeHex = $(this).data('hex');
   $('#pickcolorbg').val(codeHex);
 
-  chrome.browserAction.getBadgeText({}, function (result) {
-    draw(codeHex, undefined, result);
-  });
-
+  draw(codeHex, undefined, $('.totalOpen')[0].innerText);
 });
-
 var pickerText = $('#textColor');
 pickerText.children('div').hover(function () {
   var codeHex = $(this).data('hex');
   $('#pickcolortxt').val(codeHex);
 
-  chrome.browserAction.getBadgeText({}, function (result) {
-    draw(undefined, codeHex, result);
-  });
+  draw(undefined, codeHex, $('.totalOpen')[0].innerText);
 });
+
+function getBadgeTxt(){
+  let text ='';
+  chrome.browserAction.getBadgeText({}, function (result) {
+   text = result;
+  });
+  return text;
+}
+
 
 // Saves options to chrome.storage
 function save_options() {
@@ -74,9 +77,7 @@ document.getElementById('save').addEventListener('click', save_options);
 
 document.getElementById('reset').addEventListener('click', reset);
 function reset(){
-  chrome.browserAction.getBadgeText({}, function (result) {
-    draw(undefined,undefined,result);
-  });
+    draw(undefined,undefined,$('.totalOpen')[0].innerText);
 }
 
 function draw(bg = "#262626", txt = "#FFFFFF", text) {
@@ -84,7 +85,7 @@ function draw(bg = "#262626", txt = "#FFFFFF", text) {
   var canvas = document.createElement('canvas');
   canvas.width = 19;
   canvas.height = 19;
-
+  
   var context = canvas.getContext('2d');
   context.fillStyle = bg;
   context.fillRect(0, 0, 19, 19);
@@ -99,4 +100,20 @@ function draw(bg = "#262626", txt = "#FFFFFF", text) {
   chrome.browserAction.setIcon({
     imageData: context.getImageData(0, 0, 19, 19)
   });
+}
+
+document.getElementById('badgeStatus').addEventListener('click', hideBadge);
+function hideBadge(){
+  if(document.getElementById('badgeStatus').checked){
+    chrome.browserAction.setBadgeText({
+      'text': '' //an empty string displays nothing!
+    });
+  }else{
+    chrome.tabs.query({}, function(tabs) {
+      var tab = tabs;
+      chrome.browserAction.setBadgeText({ text: tab.length.toString()});
+      chrome.browserAction.setTitle({ title: 'Opened Tabs: ' + tab.length.toString() });
+      draw(tab.length.toString());
+    });
+  }
 }
