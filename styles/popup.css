@@ -61,3 +61,37 @@ h2 {
     transform: scale(1.15);
     border-radius: 3px;
 }
+
+
+/* lock */
+.lock {
+	width: 24px;
+    height: 24px;
+    padding-top: 3;
+    padding-left: 6;
+	background-image: url('../icon/lock.png');
+	background-repeat: no-repeat;
+	background-position: bottom right;
+}
+
+.lock:hover {
+	background-position: bottom left;
+}
+
+.lock[locked-state='true'] {
+	background-position: top left ;
+}
+
+.lock[locked-state='true']:hover {
+	background-position: top right;
+}
+
+/* end lock */
+
+.controls{
+    display: inline-flex;
+}
+
+input[type=text]:true {
+    background: #dddddd;
+}
