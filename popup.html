@@ -6,67 +6,75 @@
 
 <body>
 	<div class="container">
-		<h2>Tab Counter</h2>
-		<div id="output">
-
-			<h2>
-				Open tabs:
-				<strong class="totalOpen"></strong>
-			</h2>
-
-			<table>
-				<tr>
-					<td class="propName">
-						<h2>Background: </h2>
-					</td>
-					<td>
-
-						<div class="controls">
-							<input type="text" name="custom_color" placeholder="#FFFFFF" id="pickcolorbg" class="call-picker">
-							<div class="lock" locked-state="false"></div>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2">
-						<div id="color-palette">
-							<div class="container">
-								<div class="palette" id="background"></div>
-							</div>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td class="propName">
-						<h2>TextColor:</h2>
-					</td>
-					<td>
-						<div class="controls">
-							<input type="text" name="custom_color" placeholder="#FFFFFF" id="pickcolortxt" class="call-picker">
-							<div class="lock" locked-state="false"></div>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2">
-						<div id="color-palette">
-							<div class="container">
-								<div class="palette" id="textColor"></div>
-							</div>
-						</div>
-					</td>
-				</tr>
-			</table>
-
-			<div id="status"></div>
-			<label>
-				<input type="checkbox" id="badgeStatus">Hide badge
-			</label>
-			<button id="save">Save</button>
-			<button id="reset">Reset</button>
-			<script type="text/javascript" src="scripts/jquery-3.2.1.min.js"></script>
-			<script type="text/javascript" src="scripts/popup.js"></script>
+		<h2 class="title">Tab Counter</h2>
+		<div id="outer" style="width:100%">
+			<!-- <div class="totalOpen"></div> -->
+			<div class="item">
+				<!-- <span class="notify-badge">NaN</span> -->
+				<div class="totalOpen"></div>
+			</div>
 		</div>
+
+		<table>
+			<tr>
+				<td class="propName">
+					<h2>Background: </h2>
+				</td>
+				<td>
+					<div class="controls">
+						<input type="text" placeholder="#FFFFFF" id="pickcolorbg">
+						<div class="lock" locked-state="false"></div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<div id="color-palette">
+						<div class="container">
+							<div class="palette" id="background"></div>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="propName">
+					<h2>TextColor:</h2>
+				</td>
+				<td>
+					<div class="controls">
+						<input type="text" placeholder="#FFFFFF" id="pickcolortxt">
+						<div class="lock" locked-state="false"></div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<div id="color-palette">
+						<div class="container">
+							<div class="palette" id="textColor"></div>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<input type="checkbox" id="badgeStatus">Hide badge
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<div id="status"></div>
+				</td>
+			</tr>
+		</table>
+
+		<div class="options">
+			<img src="icon/ok64.png" width="32" height="32" id="save" title="Save" />
+			<img src="icon/restore64.png" width="32" height="32" id="reset" title="Reset to default" />
+		</div>
+
+		<script type="text/javascript" src="scripts/jquery-3.2.1.min.js"></script>
+		<script type="text/javascript" src="scripts/popup.js"></script>
 	</div>
 </body>
 
