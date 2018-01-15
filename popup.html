@@ -22,7 +22,7 @@
 				</td>
 				<td>
 					<div class="controls">
-						<input type="text" placeholder="#FFFFFF" id="pickcolorbg">
+						<input type="text" placeholder="#FFFFFF" id="pickcolorbg" class="input">
 						<div class="lock" locked-state="false"></div>
 					</div>
 				</td>
@@ -42,7 +42,7 @@
 				</td>
 				<td>
 					<div class="controls">
-						<input type="text" placeholder="#FFFFFF" id="pickcolortxt">
+						<input type="text" placeholder="#FFFFFF" id="pickcolortxt" class="input">
 						<div class="lock" locked-state="false"></div>
 					</div>
 				</td>
@@ -58,7 +58,7 @@
 			</tr>
 			<tr>
 				<td>
-					Font:
+					<h2>Font:</h2>
 				</td>
 				<td>
 					<select id="fontSelector"></select>
@@ -66,10 +66,13 @@
 			</tr>
 			<tr>
 				<td>
-					Hide Badge:
+					<h2>Hide Badge:</h2>
 				</td>
 				<td>
-					<input type="checkbox" id="badgeStatus">
+					<div class="checkbox">
+						<input type="checkbox" id="badgeStatus">
+						<label for="badgeStatus"></label>
+				   </div>
 				</td>
 			</tr>
 			<tr>
