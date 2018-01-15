@@ -3,6 +3,8 @@ To do:
 - opacity slider
 
   //context.clearRect(0,0,19,19);
-- save options(for badge show/hidden)
+- style checkbox and font selector
 
-change color on input
+-change color on input
+
+-save font/load font/ add font to draw option

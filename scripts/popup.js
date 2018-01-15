@@ -1,12 +1,9 @@
-chrome.browserAction.getBadgeText({}, function (result) {
-  $(".totalOpen").html(result);
-  $(".notify-badge").html(result);
-});
-
 var storageObj = {
   bgColor: "",
   txtColor: "",
-  isBadgeVisible: ""
+  isBadgeVisible: "",
+  fontIndex: "",
+  tabCount: ""
 };
 
 getStorage();
@@ -14,16 +11,35 @@ function getStorage() {
   chrome.storage.sync.get({
     bgColor: "",
     txtColor: "",
-    isBadgeVisible: ""
+    isBadgeVisible: "",
+    fontIndex: ""
   }, function (items) {
     UpdateStorage(items.bgColor, items.txtColor);
     storageObj.isBadgeVisible = items.isBadgeVisible;
-    console.log(storageObj.bgColor + " - " + storageObj.txtColor + " > " + storageObj.isBadgeVisible);
+    storageObj.fontIndex = items.fontIndex;
+
+    console.log(storageObj.bgColor + " - " + storageObj.txtColor + " > " + storageObj.isBadgeVisible + ' >font> ' + storageObj.fontIndex);
+
+    if(items.fontIndex){
+      document.getElementById("fontSelector").selectedIndex=fontIndex;
+    }
+
+    if (!items.isBadgeVisible) {
+      document.getElementById('badgeStatus').checked = true;
+      $('.notify-badge').hide();
+    }
+
   });
 
-/*   chrome.browserAction.getBadgeBackgroundColor( {}, function (ColorArray){
-    console.log(ColorArray);
-  }); */
+  chrome.tabs.query({}, function (tabs) {
+    storageObj.tabCount = tabs.length.toString();
+    $(".totalOpen").html(storageObj.tabCount);
+    $(".notify-badge").html(storageObj.tabCount);
+  });
+
+  /*   chrome.browserAction.getBadgeBackgroundColor( {}, function (ColorArray){
+      console.log(ColorArray);
+    }); */
 }
 
 function UpdateStorage(bg = storageObj.bgColor, txt = storageObj.txtColor) {
@@ -61,7 +77,7 @@ pickerBg.children('div').hover(function () {
     var codeHex = $(this).data('hex');
 
     UpdateStorage(codeHex, undefined);
-    draw(codeHex, storageObj.txtColor, $('.totalOpen')[0].innerText);
+    draw(codeHex, storageObj.txtColor, storageObj.tabCount);
   }
 });
 var pickerText = $('#textColor');
@@ -75,14 +91,14 @@ pickerText.children('div').hover(function () {
     $('#pickcolortxt').val(codeHex);
 
     UpdateStorage(undefined, codeHex);
-    draw(storageObj.bgColor, codeHex, $('.totalOpen')[0].innerText);
+    draw(storageObj.bgColor, codeHex, storageObj.tabCount);
   }
 });
 
-$("#pickcolorbg").on("change paste keyup", function() {
+$("#pickcolorbg").on("change paste keyup", function () {
   UpdateStorage($(this).val(), undefined);
 });
-$("#pickcolortxt").on("change paste keyup", function() {
+$("#pickcolortxt").on("change paste keyup", function () {
   UpdateStorage(undefined, $(this).val());
 });
 
@@ -123,7 +139,7 @@ function restore_options() {
     }
 
     UpdateStorage(items.bgColor, items.txtColor);
-    draw(items.bgColor, items.txtColor, $('.totalOpen')[0].innerText);
+    draw(items.bgColor, items.txtColor, storageObj.tabCount);
   });
 }
 document.addEventListener('DOMContentLoaded', restore_options);
@@ -132,8 +148,12 @@ document.getElementById('save').addEventListener('click', save_options);
 //reset icon to default
 document.getElementById('reset').addEventListener('click', reset);
 function reset() {
-  draw(undefined, undefined, $('.totalOpen')[0].innerText);
+  draw(undefined, undefined, storageObj.tabCount);
   UpdateStorage("#262626", "#FFFFFF");
+  chrome.storage.sync.set({
+    bgColor: storageObj.bgColor,
+    txtColor: storageObj.txtColor
+  }, function (items) { });
 }
 
 function draw(bg = "#262626", txt = "#FFFFFF", text) {
@@ -141,14 +161,14 @@ function draw(bg = "#262626", txt = "#FFFFFF", text) {
   canvas.width = 19;
   canvas.height = 19;
 
-  var context = canvas.getContext('2d');
+  var context = canvas.getContext('2d', { alpha: false });
   context.fillStyle = bg;
   context.fillRect(0, 0, 19, 19);
 
   context.fillStyle = txt;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.font = "11px Arial";
+  context.font = fonts[2];
   context.fillText(text.toString(), 8, 8);
 
   chrome.browserAction.setIcon({
@@ -164,20 +184,22 @@ function hideBadge() {
       'text': '' //an empty string displays nothing!
     });
     storageObj.isBadgeVisible = false;
+    $('.notify-badge').hide();
   } else {
     chrome.tabs.query({}, function (tabs) {
-      var tab = tabs;
-      chrome.browserAction.setBadgeText({ text: tab.length.toString() });
-      chrome.browserAction.setTitle({ title: 'Opened Tabs: ' + tab.length.toString() });
-      draw(tab.length.toString());
+      var tabCount = tabs.length.toString();
+      chrome.browserAction.setBadgeText({ text: tabCount });
+      chrome.browserAction.setTitle({ title: 'Opened Tabs: ' + tabCount });
+      draw(tabCount);
     });
     storageObj.isBadgeVisible = true;
+    $('.notify-badge').show();
   }
 
   //save status here
   chrome.storage.sync.set({
     isBadgeVisible: storageObj.isBadgeVisible
-  }, function (items) {console.log(items + " <<") });
+  }, function (items) { });
 
 }
 
@@ -196,3 +218,36 @@ locks.forEach(element => {
 
   }.bind(this));
 });
+
+/* font selection*/
+var fonts = [
+  "12px Arial",
+  "12px 'Arial Black'",
+  "12px 'Comic Sans MS'",
+  "12px 'Courier New'",
+  "12px 'Lucida Grande'",
+  "12px 'Lucida Sans Unicode'",
+  "12px 'Times New Roman'",
+  "12px 'Trebuchet MS'",
+  "12px Verdana",
+  "12px helvetica",
+  "12px hoge,impact"
+];
+PopulateFonts();
+function PopulateFonts() {
+  var fontSelector = document.getElementById('fontSelector');
+
+  for (let index = 0; index < fonts.length; index++) {
+    const element = fonts[index];
+
+    var opt = document.createElement("option");
+    opt.value = index;
+    opt.innerHTML = element.substring(5);
+
+    fontSelector.appendChild(opt);
+  }
+}
+
+$("#fontSelector").on('change', function() {
+  //draw with this.value font index
+})

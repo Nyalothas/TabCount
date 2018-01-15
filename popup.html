@@ -10,7 +10,7 @@
 		<div id="outer" style="width:100%">
 			<!-- <div class="totalOpen"></div> -->
 			<div class="item">
-				<!-- <span class="notify-badge">NaN</span> -->
+				<span class="notify-badge">NaN</span>
 				<div class="totalOpen"></div>
 			</div>
 		</div>
@@ -57,8 +57,19 @@
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2">
-					<input type="checkbox" id="badgeStatus">Hide badge
+				<td>
+					Font:
+				</td>
+				<td>
+					<select id="fontSelector"></select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Hide Badge:
+				</td>
+				<td>
+					<input type="checkbox" id="badgeStatus">
 				</td>
 			</tr>
 			<tr>
@@ -67,7 +78,6 @@
 				</td>
 			</tr>
 		</table>
-
 		<div class="options">
 			<img src="icon/ok64.png" width="32" height="32" id="save" title="Save" />
 			<img src="icon/restore64.png" width="32" height="32" id="reset" title="Reset to default" />
