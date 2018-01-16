@@ -1,10 +1,13 @@
 To do:
 - message: alert me when tabcounter reached x number
 - opacity slider
+//context.clearRect(0,0,19,19);
 
-  //context.clearRect(0,0,19,19);
-- style checkbox and font selector
+- change color on input
+- font size dropdown
 
--change color on input
+- alert on + alert tab count
+- sound on alert? + message
 
--save font/load font/ add font to draw option
+//ideea
+- "You have x tabs opened" audio message 

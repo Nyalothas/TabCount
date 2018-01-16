@@ -3,6 +3,8 @@ var storageObj = {
   txtColor: "",
   isBadgeVisible: "",
   fontIndex: "",
+  isAlertEnabled: "",
+  alertCount: "",
   tabCount: ""
 };
 
@@ -12,28 +14,32 @@ function getStorage() {
     bgColor: "",
     txtColor: "",
     isBadgeVisible: "",
-    fontIndex: ""
+    isAlertEnabled: "",
+    alertCount: 20,
+    fontIndex: 2
   }, function (items) {
     UpdateStorage(items.bgColor, items.txtColor);
     storageObj.isBadgeVisible = items.isBadgeVisible;
+
     storageObj.fontIndex = items.fontIndex;
-
-    console.log(storageObj.bgColor + " - " + storageObj.txtColor + " > " + storageObj.isBadgeVisible + ' >font> ' + storageObj.fontIndex);
-
-    if(items.fontIndex){
-      document.getElementById("fontSelector").selectedIndex=fontIndex;
-    }
+    document.getElementById("fontSelector").selectedIndex = storageObj.fontIndex;
 
     if (!items.isBadgeVisible) {
       document.getElementById('badgeStatus').checked = true;
       $('.notify-badge').hide();
     }
 
+    storageObj.alertCount = items.alertCount;
+    document.getElementById('alertCount').value = storageObj.alertCount;
+    if (items.isAlertEnabled) {
+      document.getElementById('alertMessage').checked = true;
+    }
+
   });
 
   chrome.tabs.query({}, function (tabs) {
     storageObj.tabCount = tabs.length.toString();
-    $(".totalOpen").html(storageObj.tabCount);
+    $(".totalOpen").html(storageObj.tabCount).css("font-family", fonts[storageObj.fontIndex].substring(5));
     $(".notify-badge").html(storageObj.tabCount);
   });
 
@@ -77,7 +83,7 @@ pickerBg.children('div').hover(function () {
     var codeHex = $(this).data('hex');
 
     UpdateStorage(codeHex, undefined);
-    draw(codeHex, storageObj.txtColor, storageObj.tabCount);
+    draw();
   }
 });
 var pickerText = $('#textColor');
@@ -91,7 +97,7 @@ pickerText.children('div').hover(function () {
     $('#pickcolortxt').val(codeHex);
 
     UpdateStorage(undefined, codeHex);
-    draw(storageObj.bgColor, codeHex, storageObj.tabCount);
+    draw();
   }
 });
 
@@ -112,7 +118,8 @@ function save_options() {
 
   chrome.storage.sync.set({
     bgColor: colorBg,
-    txtColor: txtColor
+    txtColor: txtColor,
+    fontIndex: storageObj.fontIndex
   }, function () {
     // Update status to let user know options were saved.
     var status = document.getElementById('status');
@@ -129,17 +136,18 @@ restore_options();
 function restore_options() {
   chrome.storage.sync.get({
     bgColor: "",
-    txtColor: ""
+    txtColor: "",
+    fontIndex: ""
   }, function (items) {
-    if (!items.bgColor) {
-      items.bgColor = "#262626";
-    }
-    if (!items.txtColor) {
-      items.txtColor = "#FFFFFF";
-    }
+
+    items.bgColor = items.bgColor ? items.bgColor : "#262626";
+    items.txtColor = items.txtColor ? items.txtColor : "#FFFFFF";
+    storageObj.fontIndex = items.fontIndex ? items.fontIndex : 2;
+
+    document.getElementById("fontSelector").selectedIndex = storageObj.fontIndex;
 
     UpdateStorage(items.bgColor, items.txtColor);
-    draw(items.bgColor, items.txtColor, storageObj.tabCount);
+    draw();
   });
 }
 document.addEventListener('DOMContentLoaded', restore_options);
@@ -148,28 +156,31 @@ document.getElementById('save').addEventListener('click', save_options);
 //reset icon to default
 document.getElementById('reset').addEventListener('click', reset);
 function reset() {
-  draw(undefined, undefined, storageObj.tabCount);
   UpdateStorage("#262626", "#FFFFFF");
+  storageObj.fontIndex = 2;
+  $(".totalOpen").html(storageObj.tabCount).css("font-family", fonts[storageObj.fontIndex].substring(5));
+  draw();
   chrome.storage.sync.set({
     bgColor: storageObj.bgColor,
-    txtColor: storageObj.txtColor
+    txtColor: storageObj.txtColor,
+    fontIndex: storageObj.fontIndex
   }, function (items) { });
 }
 
-function draw(bg = "#262626", txt = "#FFFFFF", text) {
+function draw() {
   var canvas = document.createElement('canvas');
   canvas.width = 19;
   canvas.height = 19;
 
   var context = canvas.getContext('2d', { alpha: false });
-  context.fillStyle = bg;
+  context.fillStyle = storageObj.bgColor;
   context.fillRect(0, 0, 19, 19);
 
-  context.fillStyle = txt;
+  context.fillStyle = storageObj.txtColor;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.font = fonts[2];
-  context.fillText(text.toString(), 8, 8);
+  context.font = fonts[storageObj.fontIndex];
+  context.fillText(storageObj.tabCount, 8, 8);
 
   chrome.browserAction.setIcon({
     imageData: context.getImageData(0, 0, 19, 19)
@@ -190,7 +201,8 @@ function hideBadge() {
       var tabCount = tabs.length.toString();
       chrome.browserAction.setBadgeText({ text: tabCount });
       chrome.browserAction.setTitle({ title: 'Opened Tabs: ' + tabCount });
-      draw(tabCount);
+      storageObj.tabCount = tabCount;
+      draw();
     });
     storageObj.isBadgeVisible = true;
     $('.notify-badge').show();
@@ -200,7 +212,6 @@ function hideBadge() {
   chrome.storage.sync.set({
     isBadgeVisible: storageObj.isBadgeVisible
   }, function (items) { });
-
 }
 
 //lock
@@ -248,6 +259,43 @@ function PopulateFonts() {
   }
 }
 
-$("#fontSelector").on('change', function() {
-  //draw with this.value font index
+$("#fontSelector").on('change', function () {
+  storageObj.fontIndex = this.value;
+  $(".totalOpen").css("font-family", fonts[storageObj.fontIndex].substring(5));
+  draw();
 })
+
+/* Alert message */
+document.getElementById('alertMessage').addEventListener('click', AlertMessage);
+function AlertMessage() {
+  if (document.getElementById('alertMessage').checked) { //this
+    var alertNr = document.getElementById('alertCount').value;
+    console.log('k');
+    function hasOnlyDigits(value) {
+      return /^-{0,1}\d+$/.test(value);
+    }
+
+    storageObj.alertCount = (hasOnlyDigits(alertNr) && alertNr > 1) ? alertNr : 20;
+    if (hasOnlyDigits(alertNr) && alertNr > 1) {
+      storageObj.alertCount = alertNr;
+      storageObj.isAlertEnabled = true;
+    } else {
+      storageObj.alertCount = 20;
+      document.getElementById('alertCount').value = storageObj.alertCount;
+      alert("Must be a number greater than 1!");
+    }
+
+  } else {
+    storageObj.isAlertEnabled = false;
+  }
+
+  chrome.storage.sync.set({
+    isAlertEnabled: storageObj.isAlertEnabled,
+    alertCount: storageObj.alertCount
+  }, function (items) { });
+}
+
+$("#alertCount").on("change paste keyup", function () {
+  AlertMessage();
+});
+

@@ -255,7 +255,7 @@ select#fontSelector {
   -webkit-padding-start: 2px;
   background-position: 97% center;
   background-repeat: no-repeat;
-  border: 1px solid rgba(255,255,255,0.1);;
+  border: 1px solid rgba(255,255,255,0.1);
   font-size: inherit;
   overflow: hidden;
   padding: 5px 5px;
@@ -265,4 +265,16 @@ select#fontSelector {
   background-image: url('../icon/arrow.png'), -webkit-linear-gradient(#252736, #252736 40%, #252736);
   background-color: #252736;
   width: 200px;   
+}
+
+#alertCount{
+    color: #03a9f4;
+    background-color: #252736;
+    width: 35px;
+    border: 0px;
+    margin-right: 5px;
+}
+
+#alertCheckbox{
+    margin-left: 5px;
 }

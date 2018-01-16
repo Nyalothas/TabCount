@@ -22,8 +22,14 @@ function updateIcon() {
   chrome.storage.sync.get({
     bgColor: "",
     txtColor: "",
-    isBadgeVisible: ""
+    isBadgeVisible: "",
+    fontIndex: 2,
+    isAlertEnabled: "",
+    alertCount: 20
   }, function (items) {
+
+/*     items.bgColor = items.bgColor ? items.bgColor : "#262626";
+    items.bgColor = items.txtColor ? items.txtColor : "#FFFFFF"; */
     if (!items.bgColor) {
       items.bgColor = "#262626";
     }
@@ -37,12 +43,20 @@ function updateIcon() {
         chrome.browserAction.setBadgeText({ text: tabCount });
       }
       chrome.browserAction.setTitle({ title: 'Opened Tabs: ' + tabCount });
-      draw(items.bgColor, items.txtColor, tabCount);
+      draw(items.bgColor, items.txtColor, tabCount, items.fontIndex);
+
+      if(isAlertEnabled && tabCount >= alertCount){
+        alert("You have " + tabCount + " tabs opened!");
+/*         var myAudio = new Audio();        // create the audio object
+        myAudio.src = "path/to/file.mp3"; // assign the audio file to its src
+        myAudio.play();    */
+      }
+
     });
   });
 }
 
-function draw(bg = "#262626", txt = "#FFFFFF", text) {
+function draw(bg = "#262626", txt = "#FFFFFF", text ,fontStyle = 2) {
   var canvas = document.createElement('canvas');
   canvas.width = 19;
   canvas.height = 19;
@@ -54,8 +68,8 @@ function draw(bg = "#262626", txt = "#FFFFFF", text) {
   context.fillStyle = txt;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.font = fonts[2];
-  context.fillText(text.toString(), 8, 8);
+  context.font = fonts[fontStyle];
+  context.fillText(text, 8, 8);
 
   chrome.browserAction.setIcon({
     imageData: context.getImageData(0, 0, 19, 19)
