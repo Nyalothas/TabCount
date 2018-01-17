@@ -4,17 +4,17 @@ chrome.tabs.onAttached.addListener(updateIcon)
 chrome.tabs.onDetached.addListener(updateIcon)
 
 var fonts = [
-  "12px Arial"                 ,
-  "12px 'Arial Black'"         ,
-  "12px 'Comic Sans MS'"       ,
-  "12px 'Courier New'"         ,
-  "12px 'Lucida Grande'"       ,
-  "12px 'Lucida Sans Unicode'" ,
-  "12px 'Times New Roman'"     ,
-  "12px 'Trebuchet MS'"        ,
-  "12px Verdana"               ,
-  "12px helvetica"             ,
-  "12px hoge,impact"           
+  "12px Arial",
+  "12px 'Arial Black'",
+  "12px 'Comic Sans MS'",
+  "12px 'Courier New'",
+  "12px 'Lucida Grande'",
+  "12px 'Lucida Sans Unicode'",
+  "12px 'Times New Roman'",
+  "12px 'Trebuchet MS'",
+  "12px Verdana",
+  "12px helvetica",
+  "12px hoge,impact"
 ];
 
 updateIcon();
@@ -25,38 +25,37 @@ function updateIcon() {
     isBadgeVisible: "",
     fontIndex: 2,
     isAlertEnabled: "",
-    alertCount: 20
+    alertCount: ""
   }, function (items) {
 
-/*     items.bgColor = items.bgColor ? items.bgColor : "#262626";
-    items.bgColor = items.txtColor ? items.txtColor : "#FFFFFF"; */
-    if (!items.bgColor) {
-      items.bgColor = "#262626";
-    }
-    if (!items.txtColor) {
-      items.txtColor = "#FFFFFF";
-    }
+    items.bgColor = items.bgColor ? items.bgColor : "#262626";
+    items.txtColor = items.txtColor ? items.txtColor : "#FFFFFF";
 
     chrome.tabs.query({}, function (tabs) {
       var tabCount = tabs.length.toString();
-      if(items.isBadgeVisible){
+      if (items.isBadgeVisible) {
         chrome.browserAction.setBadgeText({ text: tabCount });
       }
+
       chrome.browserAction.setTitle({ title: 'Opened Tabs: ' + tabCount });
       draw(items.bgColor, items.txtColor, tabCount, items.fontIndex);
 
-      if(isAlertEnabled && tabCount >= alertCount){
-        alert("You have " + tabCount + " tabs opened!");
-/*         var myAudio = new Audio();        // create the audio object
-        myAudio.src = "path/to/file.mp3"; // assign the audio file to its src
-        myAudio.play();    */
+      if (items.isAlertEnabled && parseInt(tabCount) >= parseInt(items.alertCount)) {
+        var myAudio = new Audio();        // create the audio object
+        myAudio.src = "male_warning.mp3"; // assign the audio file to its src
+        myAudio.play();
+
+        var message = "You have " + tabCount + " tabs opened!";
+
+        chrome.tts.speak(message, {},function(){}); 
+        alert(message);
       }
 
     });
   });
 }
 
-function draw(bg = "#262626", txt = "#FFFFFF", text ,fontStyle = 2) {
+function draw(bg = "#262626", txt = "#FFFFFF", text, fontStyle = 2) {
   var canvas = document.createElement('canvas');
   canvas.width = 19;
   canvas.height = 19;
