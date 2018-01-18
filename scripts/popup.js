@@ -39,7 +39,7 @@ function getStorage() {
 
   chrome.tabs.query({}, function (tabs) {
     storageObj.tabCount = tabs.length.toString();
-    $(".totalOpen").html(storageObj.tabCount).css("font-family", fonts[storageObj.fontIndex].substring(5));
+    $(".totalOpen").html(storageObj.tabCount).css("font-family", fonts[storageObj.fontIndex]);
     $(".notify-badge").html(storageObj.tabCount);
   });
 
@@ -158,7 +158,7 @@ document.getElementById('reset').addEventListener('click', reset);
 function reset() {
   UpdateStorage("#262626", "#FFFFFF");
   storageObj.fontIndex = 2;
-  $(".totalOpen").html(storageObj.tabCount).css("font-family", fonts[storageObj.fontIndex].substring(5));
+  $(".totalOpen").html(storageObj.tabCount).css("font-family", fonts[storageObj.fontIndex]);
   draw();
   chrome.storage.sync.set({
     bgColor: storageObj.bgColor,
@@ -230,21 +230,21 @@ locks.forEach(element => {
   }.bind(this));
 });
 
-/* font selection*/
+/* font family selection*/
 var fonts = [
-  "12px Arial",
-  "12px 'Arial Black'",
-  "12px 'Comic Sans MS'",
-  "12px 'Courier New'",
-  "12px 'Lucida Grande'",
-  "12px 'Lucida Sans Unicode'",
-  "12px 'Times New Roman'",
-  "12px 'Trebuchet MS'",
-  "12px Verdana",
-  "12px helvetica",
-  "12px hoge,impact"
+  "Arial",
+  "'Arial Black'",
+  "'Comic Sans MS'",
+  "'Courier New'",
+  "'Lucida Grande'",
+  "'Lucida Sans Unicode'",
+  "'Times New Roman'",
+  "'Trebuchet MS'",
+  "Verdana",
+  "helvetica",
+  "hoge,impact"
 ];
-PopulateFonts();
+/* PopulateFonts();
 function PopulateFonts() {
   var fontSelector = document.getElementById('fontSelector');
 
@@ -257,13 +257,29 @@ function PopulateFonts() {
 
     fontSelector.appendChild(opt);
   }
-}
+} */
 
 $("#fontSelector").on('change', function () {
   storageObj.fontIndex = this.value;
-  $(".totalOpen").css("font-family", fonts[storageObj.fontIndex].substring(5));
+  $(".totalOpen").css("font-family", fonts[storageObj.fontIndex]);
   draw();
 })
+
+/* font size selection*/
+/* PopulateFontSize();
+function PopulateFontSize() {
+  var fontSizeSelector = document.getElementById('fontSizeSelector');
+
+  for (let index = 12; index < 20; index++) {
+    var opt = document.createElement("option");
+    opt.value = index;
+    opt.innerHTML = index + "px";
+
+    fontSizeSelector.appendChild(opt);
+  }
+} */
+
+
 
 /* Alert message */
 document.getElementById('alertMessage').addEventListener('click', AlertMessage);

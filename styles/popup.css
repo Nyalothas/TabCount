@@ -249,7 +249,7 @@ input[type=text]{
 }
 
 /* select */
-select#fontSelector {
+select {
   -webkit-appearance: button;
   -webkit-padding-end: 20px;
   -webkit-padding-start: 2px;
@@ -265,6 +265,10 @@ select#fontSelector {
   background-image: url('../icon/arrow.png'), -webkit-linear-gradient(#252736, #252736 40%, #252736);
   background-color: #252736;
   width: 200px;   
+}
+
+select#fontSizeSelector{
+    width: 70px;
 }
 
 #alertCount{
