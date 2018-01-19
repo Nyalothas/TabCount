@@ -4,17 +4,28 @@ chrome.tabs.onAttached.addListener(updateIcon)
 chrome.tabs.onDetached.addListener(updateIcon)
 
 var fonts = [
-  "12px Arial",
-  "12px 'Arial Black'",
-  "12px 'Comic Sans MS'",
-  "12px 'Courier New'",
-  "12px 'Lucida Grande'",
-  "12px 'Lucida Sans Unicode'",
-  "12px 'Times New Roman'",
-  "12px 'Trebuchet MS'",
-  "12px Verdana",
-  "12px helvetica",
-  "12px hoge,impact"
+  "Arial",
+  "'Arial Black'",
+  "'Comic Sans MS'",
+  "'Courier New'",
+  "'Lucida Grande'",
+  "'Lucida Sans Unicode'",
+  "'Times New Roman'",
+  "'Trebuchet MS'",
+  "Verdana",
+  "helvetica",
+  "hoge,impact"
+];
+
+var fontSizes = [
+  "12px ",
+  "13px ",
+  "14px ",
+  "15px ",
+  "16px ",
+  "17px ",
+  "18px ",
+  "19px "
 ];
 
 updateIcon();
@@ -22,8 +33,10 @@ function updateIcon() {
   chrome.storage.sync.get({
     bgColor: "",
     txtColor: "",
+    bgOpacity: 1,
     isBadgeVisible: "",
     fontIndex: 2,
+    fontSizeIndex: 0,
     isAlertEnabled: "",
     alertCount: ""
   }, function (items) {
@@ -38,7 +51,7 @@ function updateIcon() {
       }
 
       chrome.browserAction.setTitle({ title: 'Opened Tabs: ' + tabCount });
-      draw(items.bgColor, items.txtColor, tabCount, items.fontIndex);
+      draw(items.bgColor, items.txtColor, tabCount, items.fontIndex , items.fontSizeIndex, items.bgOpacity);
 
       if (items.isAlertEnabled && parseInt(tabCount) >= parseInt(items.alertCount)) {
         var myAudio = new Audio();        // create the audio object
@@ -55,22 +68,34 @@ function updateIcon() {
   });
 }
 
-function draw(bg = "#262626", txt = "#FFFFFF", text, fontStyle = 2) {
+function draw(bg = "#262626", txt = "#FFFFFF", text, fontStyle = 2, fontSizeIndex = 0, bgOpacity = 1) {
   var canvas = document.createElement('canvas');
   canvas.width = 19;
   canvas.height = 19;
 
   var context = canvas.getContext('2d');
-  context.fillStyle = bg;
+  context.fillStyle = hexToRgbA(bg, bgOpacity);
   context.fillRect(0, 0, 19, 19);
 
   context.fillStyle = txt;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.font = fonts[fontStyle];
+  context.font = fontSizes[fontSizeIndex] + fonts[fontStyle];
   context.fillText(text, 8, 8);
 
   chrome.browserAction.setIcon({
     imageData: context.getImageData(0, 0, 19, 19)
   });
+}
+
+function hexToRgbA(hex, opacity) {
+  var c;
+  if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+    c = hex.substring(1).split('');
+    if (c.length == 3) {
+      c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    }
+    c = '0x' + c.join('');
+    return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',' + opacity + ')';
+  }
 }

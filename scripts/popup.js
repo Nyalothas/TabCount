@@ -1,8 +1,10 @@
 var storageObj = {
   bgColor: "",
   txtColor: "",
+  bgOpacity: "",
   isBadgeVisible: "",
   fontIndex: "",
+  fontSizeIndex: "",
   isAlertEnabled: "",
   alertCount: "",
   tabCount: ""
@@ -13,16 +15,23 @@ function getStorage() {
   chrome.storage.sync.get({
     bgColor: "",
     txtColor: "",
+    bgOpacity: 1,
     isBadgeVisible: "",
     isAlertEnabled: "",
     alertCount: 20,
-    fontIndex: 2
+    fontIndex: 2,
+    fontSizeIndex: 0
   }, function (items) {
     UpdateStorage(items.bgColor, items.txtColor);
     storageObj.isBadgeVisible = items.isBadgeVisible;
 
     storageObj.fontIndex = items.fontIndex;
     document.getElementById("fontSelector").selectedIndex = storageObj.fontIndex;
+    storageObj.fontSizeIndex = items.fontSizeIndex;
+    document.getElementById("fontSizeSelector").selectedIndex = storageObj.fontSizeIndex;
+
+    storageObj.bgOpacity = items.bgOpacity;
+    document.getElementsByClassName('range-slider__range')[0].value = storageObj.bgOpacity;
 
     if (!items.isBadgeVisible) {
       document.getElementById('badgeStatus').checked = true;
@@ -53,8 +62,8 @@ function UpdateStorage(bg = storageObj.bgColor, txt = storageObj.txtColor) {
   storageObj.txtColor = txt;
   $('#pickcolorbg').val(bg).css("color", bg);
   $('#pickcolortxt').val(txt).css("color", txt);
-
-  $('.totalOpen').css("background", bg);
+  
+  $('.totalOpen').css("background", hexToRgbA(storageObj.bgColor, storageObj.bgOpacity));
   $('.totalOpen').css("color", txt)
 }
 
@@ -117,9 +126,11 @@ function save_options() {
   storageObj.txtColor = txtColor;
 
   chrome.storage.sync.set({
-    bgColor: colorBg,
-    txtColor: txtColor,
-    fontIndex: storageObj.fontIndex
+    bgColor: storageObj.bgColor,
+    txtColor: storageObj.txtColor,
+    bgOpacity: storageObj.bgOpacity,
+    fontIndex: storageObj.fontIndex,
+    fontSizeIndex: storageObj.fontSizeIndex
   }, function () {
     // Update status to let user know options were saved.
     var status = document.getElementById('status');
@@ -137,14 +148,19 @@ function restore_options() {
   chrome.storage.sync.get({
     bgColor: "",
     txtColor: "",
-    fontIndex: ""
+    bgOpacity: "",
+    fontIndex: "",
+    fontSizeIndex: ""
   }, function (items) {
 
     items.bgColor = items.bgColor ? items.bgColor : "#262626";
     items.txtColor = items.txtColor ? items.txtColor : "#FFFFFF";
     storageObj.fontIndex = items.fontIndex ? items.fontIndex : 2;
+    storageObj.fontSizeIndex = items.fontSizeIndex ? items.fontSizeIndex : 0;
+    storageObj.bgOpacity = items.bgOpacity ? items.bgOpacity : 1;
 
     document.getElementById("fontSelector").selectedIndex = storageObj.fontIndex;
+    document.getElementById("fontSizeSelector").selectedIndex = storageObj.fontSizeIndex;
 
     UpdateStorage(items.bgColor, items.txtColor);
     draw();
@@ -158,12 +174,16 @@ document.getElementById('reset').addEventListener('click', reset);
 function reset() {
   UpdateStorage("#262626", "#FFFFFF");
   storageObj.fontIndex = 2;
+  storageObj.fontSizeIndex = 0;
+  storageObj.bgOpacity = 1;
   $(".totalOpen").html(storageObj.tabCount).css("font-family", fonts[storageObj.fontIndex]);
   draw();
   chrome.storage.sync.set({
     bgColor: storageObj.bgColor,
     txtColor: storageObj.txtColor,
-    fontIndex: storageObj.fontIndex
+    bgOpacity: storageObj.bgOpacity,
+    fontIndex: storageObj.fontIndex,
+    fontSizeIndex: storageObj.fontSizeIndex
   }, function (items) { });
 }
 
@@ -172,14 +192,14 @@ function draw() {
   canvas.width = 19;
   canvas.height = 19;
 
-  var context = canvas.getContext('2d', { alpha: false });
-  context.fillStyle = storageObj.bgColor;
+  var context = canvas.getContext('2d');
+  context.fillStyle = hexToRgbA(storageObj.bgColor, storageObj.bgOpacity);
   context.fillRect(0, 0, 19, 19);
 
   context.fillStyle = storageObj.txtColor;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.font = fonts[storageObj.fontIndex];
+  context.font = fontSizes[storageObj.fontSizeIndex] + fonts[storageObj.fontIndex];
   context.fillText(storageObj.tabCount, 8, 8);
 
   chrome.browserAction.setIcon({
@@ -244,6 +264,18 @@ var fonts = [
   "helvetica",
   "hoge,impact"
 ];
+
+var fontSizes = [
+  "12px ",
+  "13px ",
+  "14px ",
+  "15px ",
+  "16px ",
+  "17px ",
+  "18px ",
+  "19px "
+];
+
 /* PopulateFonts();
 function PopulateFonts() {
   var fontSelector = document.getElementById('fontSelector');
@@ -265,9 +297,14 @@ $("#fontSelector").on('change', function () {
   draw();
 })
 
+$("#fontSizeSelector").on('change', function () {
+  storageObj.fontSizeIndex = this.value;
+  draw();
+})
+
 /* font size selection*/
-/* PopulateFontSize();
-function PopulateFontSize() {
+/* PopulatefontSize();
+function PopulatefontSize() {
   var fontSizeSelector = document.getElementById('fontSizeSelector');
 
   for (let index = 12; index < 20; index++) {
@@ -286,7 +323,7 @@ document.getElementById('alertMessage').addEventListener('click', AlertMessage);
 function AlertMessage() {
   if (document.getElementById('alertMessage').checked) { //this
     var alertNr = document.getElementById('alertCount').value;
-    console.log('k');
+
     function hasOnlyDigits(value) {
       return /^-{0,1}\d+$/.test(value);
     }
@@ -315,3 +352,38 @@ $("#alertCount").on("change paste keyup", function () {
   AlertMessage();
 });
 
+
+var rangeSlider = function () {
+  var slider = $('.range-slider'),
+    range = $('.range-slider__range'),
+    value = $('.range-slider__value');
+
+  slider.each(function () {
+    value.each(function () {
+      var value = $(this).prev().attr('value');
+      $(this).html(value);
+    });
+
+    range.on('input', function () {
+      $(this).next(value).html(this.value);
+      $('.totalOpen').css("background", hexToRgbA(storageObj.bgColor, storageObj.bgOpacity));
+      storageObj.bgOpacity = this.value;
+      draw();
+
+    });
+  });
+
+};
+rangeSlider();
+
+function hexToRgbA(hex, opacity) {
+  var c;
+  if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+    c = hex.substring(1).split('');
+    if (c.length == 3) {
+      c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    }
+    c = '0x' + c.join('');
+    return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',' + opacity + ')';
+  }
+}

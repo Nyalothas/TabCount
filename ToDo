@@ -1,6 +1,5 @@
 To do:
-- opacity slider
-//context.clearRect(0,0,19,19);
-
+- preview icon opacity
+- initialize opacity slider value on startup
 - change color on input
-- font size dropdown
+- pass a single object, instead of strings
