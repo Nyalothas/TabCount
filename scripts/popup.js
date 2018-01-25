@@ -32,6 +32,7 @@ function getStorage() {
 
     storageObj.bgOpacity = items.bgOpacity;
     document.getElementsByClassName('range-slider__range')[0].value = storageObj.bgOpacity;
+    document.getElementsByClassName('range-slider__value')[0].innerHTML = storageObj.bgOpacity;
 
     if (!items.isBadgeVisible) {
       document.getElementById('badgeStatus').checked = true;
@@ -62,7 +63,7 @@ function UpdateStorage(bg = storageObj.bgColor, txt = storageObj.txtColor) {
   storageObj.txtColor = txt;
   $('#pickcolorbg').val(bg).css("color", bg);
   $('#pickcolortxt').val(txt).css("color", txt);
-  
+
   $('.totalOpen').css("background", hexToRgbA(storageObj.bgColor, storageObj.bgOpacity));
   $('.totalOpen').css("color", txt)
 }
@@ -111,10 +112,17 @@ pickerText.children('div').hover(function () {
 });
 
 $("#pickcolorbg").on("change paste keyup", function () {
-  UpdateStorage($(this).val(), undefined);
+  if($(this).val().length == 4 || $(this).val().length == 7){
+    UpdateStorage($(this).val(), undefined);
+    draw();
+  }
+ 
 });
 $("#pickcolortxt").on("change paste keyup", function () {
-  UpdateStorage(undefined, $(this).val());
+  if($(this).val().length == 4 || $(this).val().length == 7){
+    UpdateStorage(undefined, $(this).val());
+    draw();
+  }
 });
 
 // Saves options to chrome.storage
@@ -366,8 +374,8 @@ var rangeSlider = function () {
 
     range.on('input', function () {
       $(this).next(value).html(this.value);
-      $('.totalOpen').css("background", hexToRgbA(storageObj.bgColor, storageObj.bgOpacity));
       storageObj.bgOpacity = this.value;
+      $('.totalOpen').css("background", hexToRgbA(storageObj.bgColor, storageObj.bgOpacity));
       draw();
 
     });

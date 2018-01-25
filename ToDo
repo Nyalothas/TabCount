@@ -1,5 +1,2 @@
 To do:
-- preview icon opacity
-- initialize opacity slider value on startup
-- change color on input
 - pass a single object, instead of strings
