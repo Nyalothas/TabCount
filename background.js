@@ -5,7 +5,6 @@ chrome.tabs.onDetached.addListener(updateIcon)
 
 var fonts = [
   "Arial",
-  "'Arial Black'",
   "'Comic Sans MS'",
   "'Courier New'",
   "'Lucida Grande'",
@@ -31,29 +30,22 @@ var fontSizes = [
 updateIcon();
 function updateIcon() {
   chrome.storage.sync.get({
-    bgColor: "",
-    txtColor: "",
-    bgOpacity: 1,
-    isBadgeVisible: "",
-    fontIndex: 2,
-    fontSizeIndex: 0,
-    isAlertEnabled: "",
-    alertCount: ""
+    storageObj: ""
   }, function (items) {
 
-    items.bgColor = items.bgColor ? items.bgColor : "#262626";
-    items.txtColor = items.txtColor ? items.txtColor : "#FFFFFF";
+    items.storageObj.bgColor = items.storageObj.bgColor ? items.storageObj.bgColor : "#262626";
+    items.storageObj.txtColor = items.storageObj.txtColor ? items.storageObj.txtColor : "#FFFFFF";
 
     chrome.tabs.query({}, function (tabs) {
       var tabCount = tabs.length.toString();
-      if (items.isBadgeVisible) {
+      if (items.storageObj.isBadgeVisible) {
         chrome.browserAction.setBadgeText({ text: tabCount });
       }
 
       chrome.browserAction.setTitle({ title: 'Opened Tabs: ' + tabCount });
-      draw(items.bgColor, items.txtColor, tabCount, items.fontIndex , items.fontSizeIndex, items.bgOpacity);
+      draw(items.storageObj.bgColor, items.storageObj.txtColor, tabCount, items.storageObj.fontIndex , items.storageObj.fontSizeIndex, items.storageObj.bgOpacity);
 
-      if (items.isAlertEnabled && parseInt(tabCount) >= parseInt(items.alertCount)) {
+      if (items.storageObj.isAlertEnabled && parseInt(tabCount) >= parseInt(items.storageObj.alertCount)) {
         var myAudio = new Audio();        // create the audio object
         myAudio.src = "male_warning.mp3"; // assign the audio file to its src
         myAudio.play();
@@ -68,7 +60,7 @@ function updateIcon() {
   });
 }
 
-function draw(bg = "#262626", txt = "#FFFFFF", text, fontStyle = 2, fontSizeIndex = 0, bgOpacity = 1) {
+function draw(bg = "#262626", txt = "#FFFFFF", text, fontStyle = 1, fontSizeIndex = 0, bgOpacity = 1) {
   var canvas = document.createElement('canvas');
   canvas.width = 19;
   canvas.height = 19;

@@ -1,3 +1,8 @@
+document.getElementById('save').addEventListener('click', save_options);
+document.getElementById('reset').addEventListener('click', reset);
+document.getElementById('badgeStatus').addEventListener('click', hideBadge);
+document.getElementById('alertMessage').addEventListener('click', AlertMessage);
+
 var storageObj = {
   bgColor: "",
   txtColor: "",
@@ -10,38 +15,58 @@ var storageObj = {
   tabCount: ""
 };
 
+var fonts = [
+  "Arial",
+  "'Comic Sans MS'",
+  "'Courier New'",
+  "'Lucida Grande'",
+  "'Lucida Sans Unicode'",
+  "'Times New Roman'",
+  "'Trebuchet MS'",
+  "Verdana",
+  "helvetica",
+  "hoge,impact"
+];
+
+var fontSizes = [
+  "12px ",
+  "13px ",
+  "14px ",
+  "15px ",
+  "16px ",
+  "17px ",
+  "18px ",
+  "19px "
+];
+
+
 getStorage();
 function getStorage() {
   chrome.storage.sync.get({
-    bgColor: "",
-    txtColor: "",
-    bgOpacity: 1,
-    isBadgeVisible: "",
-    isAlertEnabled: "",
-    alertCount: 20,
-    fontIndex: 2,
-    fontSizeIndex: 0
+    storageObj : ""
   }, function (items) {
-    UpdateStorage(items.bgColor, items.txtColor);
-    storageObj.isBadgeVisible = items.isBadgeVisible;
 
-    storageObj.fontIndex = items.fontIndex;
+    storageObj.bgColor = items.storageObj.bgColor ? items.storageObj.bgColor : "#262626";
+    storageObj.txtColor = items.storageObj.txtColor ? items.storageObj.txtColor : "#FFFFFF";
+    storageObj.isBadgeVisible = items.storageObj.isBadgeVisible ? items.storageObj.isBadgeVisible : false;
+    storageObj.fontIndex = items.storageObj.fontIndex ? items.storageObj.fontIndex : 1;
+    storageObj.fontSizeIndex = items.storageObj.fontSizeIndex ? items.storageObj.fontSizeIndex : 0;
+    storageObj.bgOpacity = items.storageObj.bgOpacity ? items.storageObj.bgOpacity : 1;
+    storageObj.alertCount = items.storageObj.alertCount ? items.storageObj.alertCount : 20;
+
+    UpdateStorage(storageObj.bgColor, storageObj.txtColor);
     document.getElementById("fontSelector").selectedIndex = storageObj.fontIndex;
-    storageObj.fontSizeIndex = items.fontSizeIndex;
     document.getElementById("fontSizeSelector").selectedIndex = storageObj.fontSizeIndex;
-
-    storageObj.bgOpacity = items.bgOpacity;
     document.getElementsByClassName('range-slider__range')[0].value = storageObj.bgOpacity;
     document.getElementsByClassName('range-slider__value')[0].innerHTML = storageObj.bgOpacity;
 
-    if (!items.isBadgeVisible) {
+    if (!items.storageObj.isBadgeVisible) {
       document.getElementById('badgeStatus').checked = true;
       $('.notify-badge').hide();
     }
 
-    storageObj.alertCount = items.alertCount;
     document.getElementById('alertCount').value = storageObj.alertCount;
-    if (items.isAlertEnabled) {
+    if (items.storageObj.isAlertEnabled) {
       document.getElementById('alertMessage').checked = true;
     }
 
@@ -52,10 +77,6 @@ function getStorage() {
     $(".totalOpen").html(storageObj.tabCount).css("font-family", fonts[storageObj.fontIndex]);
     $(".notify-badge").html(storageObj.tabCount);
   });
-
-  /*   chrome.browserAction.getBadgeBackgroundColor( {}, function (ColorArray){
-      console.log(ColorArray);
-    }); */
 }
 
 function UpdateStorage(bg = storageObj.bgColor, txt = storageObj.txtColor) {
@@ -134,11 +155,7 @@ function save_options() {
   storageObj.txtColor = txtColor;
 
   chrome.storage.sync.set({
-    bgColor: storageObj.bgColor,
-    txtColor: storageObj.txtColor,
-    bgOpacity: storageObj.bgOpacity,
-    fontIndex: storageObj.fontIndex,
-    fontSizeIndex: storageObj.fontSizeIndex
+    storageObj : storageObj
   }, function () {
     // Update status to let user know options were saved.
     var status = document.getElementById('status');
@@ -149,49 +166,21 @@ function save_options() {
   });
 }
 
-// Restores select box and checkbox state using the preferences
-// stored in chrome.storage.
-restore_options();
-function restore_options() {
-  chrome.storage.sync.get({
-    bgColor: "",
-    txtColor: "",
-    bgOpacity: "",
-    fontIndex: "",
-    fontSizeIndex: ""
-  }, function (items) {
-
-    items.bgColor = items.bgColor ? items.bgColor : "#262626";
-    items.txtColor = items.txtColor ? items.txtColor : "#FFFFFF";
-    storageObj.fontIndex = items.fontIndex ? items.fontIndex : 2;
-    storageObj.fontSizeIndex = items.fontSizeIndex ? items.fontSizeIndex : 0;
-    storageObj.bgOpacity = items.bgOpacity ? items.bgOpacity : 1;
-
-    document.getElementById("fontSelector").selectedIndex = storageObj.fontIndex;
-    document.getElementById("fontSizeSelector").selectedIndex = storageObj.fontSizeIndex;
-
-    UpdateStorage(items.bgColor, items.txtColor);
-    draw();
-  });
-}
-document.addEventListener('DOMContentLoaded', restore_options);
-document.getElementById('save').addEventListener('click', save_options);
-
 //reset icon to default
-document.getElementById('reset').addEventListener('click', reset);
 function reset() {
   UpdateStorage("#262626", "#FFFFFF");
-  storageObj.fontIndex = 2;
+  storageObj.fontIndex = 1;
   storageObj.fontSizeIndex = 0;
   storageObj.bgOpacity = 1;
+
   $(".totalOpen").html(storageObj.tabCount).css("font-family", fonts[storageObj.fontIndex]);
+  document.getElementsByClassName('range-slider__range')[0].value = storageObj.bgOpacity;
+  document.getElementsByClassName('range-slider__value')[0].innerHTML = storageObj.bgOpacity;
+  document.getElementById("fontSelector").selectedIndex = storageObj.fontIndex;
+  document.getElementById("fontSizeSelector").selectedIndex = storageObj.fontSizeIndex;
   draw();
   chrome.storage.sync.set({
-    bgColor: storageObj.bgColor,
-    txtColor: storageObj.txtColor,
-    bgOpacity: storageObj.bgOpacity,
-    fontIndex: storageObj.fontIndex,
-    fontSizeIndex: storageObj.fontSizeIndex
+    storageObj: storageObj
   }, function (items) { });
 }
 
@@ -216,14 +205,13 @@ function draw() {
 }
 
 //hide badge
-document.getElementById('badgeStatus').addEventListener('click', hideBadge);
 function hideBadge() {
   if (document.getElementById('badgeStatus').checked) {
     chrome.browserAction.setBadgeText({
       'text': '' //an empty string displays nothing!
     });
     storageObj.isBadgeVisible = false;
-    $('.notify-badge').hide();
+    //$('.notify-badge').hide();
   } else {
     chrome.tabs.query({}, function (tabs) {
       var tabCount = tabs.length.toString();
@@ -233,12 +221,12 @@ function hideBadge() {
       draw();
     });
     storageObj.isBadgeVisible = true;
-    $('.notify-badge').show();
+    //$('.notify-badge').show();
   }
-
+  $('.notify-badge').toggle();
   //save status here
   chrome.storage.sync.set({
-    isBadgeVisible: storageObj.isBadgeVisible
+    storageObj: storageObj
   }, function (items) { });
 }
 
@@ -259,46 +247,6 @@ locks.forEach(element => {
 });
 
 /* font family selection*/
-var fonts = [
-  "Arial",
-  "'Arial Black'",
-  "'Comic Sans MS'",
-  "'Courier New'",
-  "'Lucida Grande'",
-  "'Lucida Sans Unicode'",
-  "'Times New Roman'",
-  "'Trebuchet MS'",
-  "Verdana",
-  "helvetica",
-  "hoge,impact"
-];
-
-var fontSizes = [
-  "12px ",
-  "13px ",
-  "14px ",
-  "15px ",
-  "16px ",
-  "17px ",
-  "18px ",
-  "19px "
-];
-
-/* PopulateFonts();
-function PopulateFonts() {
-  var fontSelector = document.getElementById('fontSelector');
-
-  for (let index = 0; index < fonts.length; index++) {
-    const element = fonts[index];
-
-    var opt = document.createElement("option");
-    opt.value = index;
-    opt.innerHTML = element.substring(5);
-
-    fontSelector.appendChild(opt);
-  }
-} */
-
 $("#fontSelector").on('change', function () {
   storageObj.fontIndex = this.value;
   $(".totalOpen").css("font-family", fonts[storageObj.fontIndex]);
@@ -310,24 +258,7 @@ $("#fontSizeSelector").on('change', function () {
   draw();
 })
 
-/* font size selection*/
-/* PopulatefontSize();
-function PopulatefontSize() {
-  var fontSizeSelector = document.getElementById('fontSizeSelector');
-
-  for (let index = 12; index < 20; index++) {
-    var opt = document.createElement("option");
-    opt.value = index;
-    opt.innerHTML = index + "px";
-
-    fontSizeSelector.appendChild(opt);
-  }
-} */
-
-
-
 /* Alert message */
-document.getElementById('alertMessage').addEventListener('click', AlertMessage);
 function AlertMessage() {
   if (document.getElementById('alertMessage').checked) { //this
     var alertNr = document.getElementById('alertCount').value;
@@ -336,7 +267,7 @@ function AlertMessage() {
       return /^-{0,1}\d+$/.test(value);
     }
 
-    storageObj.alertCount = (hasOnlyDigits(alertNr) && alertNr > 1) ? alertNr : 20;
+    //storageObj.alertCount = (hasOnlyDigits(alertNr) && alertNr > 1) ? alertNr : 20;
     if (hasOnlyDigits(alertNr) && alertNr > 1) {
       storageObj.alertCount = alertNr;
       storageObj.isAlertEnabled = true;
@@ -351,8 +282,7 @@ function AlertMessage() {
   }
 
   chrome.storage.sync.set({
-    isAlertEnabled: storageObj.isAlertEnabled,
-    alertCount: storageObj.alertCount
+    storageObj : storageObj
   }, function (items) { });
 }
 
@@ -360,7 +290,7 @@ $("#alertCount").on("change paste keyup", function () {
   AlertMessage();
 });
 
-
+/* Opacity slider */
 var rangeSlider = function () {
   var slider = $('.range-slider'),
     range = $('.range-slider__range'),
